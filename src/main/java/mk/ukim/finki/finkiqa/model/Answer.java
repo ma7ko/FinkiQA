@@ -9,10 +9,16 @@ import javax.persistence.*;
 public class Answer {
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
+
     private String explanation;
+
     private Long likes;
+
     private Long dislikes;
+
+    @ManyToOne
+    private Question question;
 
     @OneToOne
     private User user;
@@ -20,9 +26,11 @@ public class Answer {
     public Answer() {
     }
 
-    public Answer(String explanation, Long likes, Long dislikes) {
+    public Answer(String explanation, Long likes, Long dislikes, Question question, User user) {
         this.explanation = explanation;
         this.likes = likes;
         this.dislikes = dislikes;
+        this.question = question;
+        this.user = user;
     }
 }

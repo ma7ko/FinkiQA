@@ -11,15 +11,16 @@ import javax.persistence.Id;
 public class Tag {
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
+
     private String name;
+
     private String description;
 
     public Tag() {
     }
 
-    public Tag(String name, String description) {
+    public Tag(String name) {
         this.name = name;
-        this.description = description;
     }
 }

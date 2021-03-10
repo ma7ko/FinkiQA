@@ -3,10 +3,7 @@ package mk.ukim.finki.finkiqa.model;
 import lombok.Data;
 import mk.ukim.finki.finkiqa.model.enumeration.Role;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Data
@@ -15,13 +12,15 @@ import java.util.List;
 public class User {
     @Id
     private String username;
-    private String password;
-    private String name;
-    private String surname;
-    private Role role;
 
-    @OneToMany
-    private List<Question> questions;
+    private String password;
+
+    private String name;
+
+    private String surname;
+
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
     public User() {
     }

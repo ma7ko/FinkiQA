@@ -1,0 +1,7 @@
+#tag-remove:hover {
+    color: white;
+}
+
+.tag-remove-hidden {
+    visibility: hidden;
+}
