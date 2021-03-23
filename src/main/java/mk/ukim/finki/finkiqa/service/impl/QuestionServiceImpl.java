@@ -1,8 +1,10 @@
 package mk.ukim.finki.finkiqa.service.impl;
 
+import mk.ukim.finki.finkiqa.model.Answer;
 import mk.ukim.finki.finkiqa.model.Question;
 import mk.ukim.finki.finkiqa.model.Tag;
 import mk.ukim.finki.finkiqa.model.User;
+import mk.ukim.finki.finkiqa.repository.AnswerRepository;
 import mk.ukim.finki.finkiqa.repository.QuestionRepository;
 import mk.ukim.finki.finkiqa.repository.TagRepository;
 import mk.ukim.finki.finkiqa.repository.UserRepository;
@@ -21,13 +23,16 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final AnswerRepository answerRepository;
 
     public QuestionServiceImpl(QuestionRepository questionRepository,
                                UserRepository userRepository,
-                               TagRepository tagRepository) {
+                               TagRepository tagRepository,
+                               AnswerRepository answerRepository) {
         this.questionRepository = questionRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
+        this.answerRepository = answerRepository;
     }
 
     @Override
@@ -103,6 +108,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteById(Long Id) {
+        List<Answer> answers = this.answerRepository.findAllByQuestionId(Id);
+        answers.stream().forEach(answer -> this.answerRepository.deleteById(answer.getId()));
         this.questionRepository.deleteById(Id);
     }
 }

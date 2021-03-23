@@ -50,6 +50,15 @@ const FinkiQAService = {
             "userId": userId
         });
     },
+    editAnswer: (id, explanation, likes, dislikes, questionId, userId) => {
+        return axios.put(`/answers/${id}/edit`, {
+            "explanation": explanation,
+            "likes": likes,
+            "dislikes": dislikes,
+            "questionId": questionId,
+            "userId": userId
+        });
+    },
     getAnswersByQuestionId: (id) => {
         return axios.get(`/questions/${id}/answers`);
     },

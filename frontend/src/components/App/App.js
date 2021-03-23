@@ -29,11 +29,13 @@ class App extends Component {
           <Header isAddMode={this.isAdd}/>
           <main>
             <div className={"container"}>
-              <Route path={"/questions/add"} exact render={() =>
-                  <QuestionsForm question={this.state.selectedQuestion}
+              <Route path={"/questions/form/:id"} exact render={(props) =>
+                  <QuestionsForm
                   tags={this.state.tags} isAddMode={this.state.selectedQuestion === undefined}
                   onAddQuestion={this.addQuestion}
-                                 onEditQuestion={this.editQuestion}/> }/>
+                                 onEditQuestion={this.editQuestion}
+                  onSubmitted={this.loadQuestions}
+                  props={props}/> }/>
                   <Route path={"/questions/:id/details"} exact render={(props) =>
                       <QuestionDetails question={this.state.selectedQuestion}
                                        answers={this.state.answers}
@@ -42,6 +44,7 @@ class App extends Component {
                                        onAddAnswer={this.addAnswer}
                                        onAnswerEdit={this.getAnswer}
                                        onAnswerDelete={this.deleteAnswer}
+                                       onEditAnswer={this.editAnswer}
                                        likeAnswer={this.likeAnswer}
                                        dislikeAnswer={this.dislikeAnswer}
                                        props={props}/>}/>
@@ -84,19 +87,6 @@ class App extends Component {
         });
   }
 
-  addQuestion = (title, description, likes, dislikes, username, tags) => {
-      FinkiQAService.addQuestion(title, description, likes, dislikes, username, tags)
-          .then(() => {
-              this.loadQuestions();
-          });
-  }
-    editQuestion = (id, title, description, likes, dislikes, username, tags) => {
-        FinkiQAService.editQuestion(id, title, description, likes, dislikes, username, tags)
-            .then(() => {
-                this.loadQuestions();
-            });
-    }
-
   addTag = (name) => {
       FinkiQAService.addTag(name)
           .then(() => {
@@ -109,15 +99,6 @@ class App extends Component {
           .then(() => {
               this.loadQuestions();
           })
-  }
-
-  getQuestion = (id) => {
-      FinkiQAService.getQuestion(id)
-          .then((data) => {
-              this.setState({
-                  selectedQuestion: data.data
-              });
-          });
   }
 
   getTagsFromQuestionId = (id) => {
@@ -163,6 +144,13 @@ class App extends Component {
           });
   }
 
+  editAnswer = (id, explanation, likes, dislikes, questionId, userId) => {
+      FinkiQAService.editAnswer(id, explanation, likes, dislikes, questionId, userId)
+          .then(() => {
+          this.getAnswersFromQuestionId(questionId);
+      });
+  }
+
   addAnswer = (explanation, likes, dislikes, questionId, username) => {
       FinkiQAService.addAnswer(explanation, likes, dislikes, questionId, username)
           .then(() => {
@@ -205,6 +193,15 @@ class App extends Component {
           })
       }
   }
+
+    getQuestion = (id) => {
+        FinkiQAService.getQuestion(id)
+            .then((data) => {
+                this.setState({
+                    selectedQuestion: data.data
+                });
+            });
+    }
 
   componentDidMount() {
     this.loadQuestions();

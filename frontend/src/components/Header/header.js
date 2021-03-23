@@ -16,7 +16,7 @@ const header = (props) => {
                         <Link className="nav-link" to={"/questions"}>Home</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to={"/questions/add"} onClick={() => props.isAddMode(true)}>Ask question</Link>
+                        <Link className="nav-link" to={`/questions/form/${null}`} onClick={() => props.isAddMode(true)}>Ask question</Link>
                     </li>
                     <li className="nav-item">
                         <Link className="nav-link" to={"/tags"}>Tags</Link>

@@ -25,8 +25,8 @@ const questionDetails = (props) => {
                     </div>
                     <div className={"container"}>
                         <AnswerForm questionId={props.props.match.params.id}
-                                    answer={props.answer}
-                                    onAddAnswer={props.onAddAnswer} />
+                                    onAddAnswer={props.onAddAnswer}
+                                    props={props.props}/>
                     </div>
                     <div className={"container"}>
                         {props.answers.map((term) => {
@@ -34,8 +34,11 @@ const questionDetails = (props) => {
                                                questionId={props.props.match.params.id}
                                                onAnswerDelete={props.onAnswerDelete}
                                                onAnswerEdit={props.onAnswerEdit}
+                                               onEditAnswer={props.onEditAnswer}
+                                               onAddAnswer={props.onAddAnswer}
                                                likeAnswer={props.likeAnswer}
-                                               dislikeAnswer={props.dislikeAnswer}/>
+                                               dislikeAnswer={props.dislikeAnswer}
+                                               props={props.props}/>
                         })}
                     </div>
                 </div>

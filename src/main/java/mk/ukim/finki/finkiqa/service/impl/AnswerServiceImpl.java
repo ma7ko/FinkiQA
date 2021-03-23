@@ -65,7 +65,7 @@ public class AnswerServiceImpl implements AnswerService {
         User user = this.userRepository.findById(username).orElseThrow(IllegalAccessError::new);
         answer.setUser(user);
 
-        return Optional.of(this.answerRepository.save(new Answer(explanation, likes, dislikes, question, user)));
+        return Optional.of(this.answerRepository.save(answer));
 
     }
 

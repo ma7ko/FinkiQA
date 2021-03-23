@@ -1,63 +1,98 @@
-import React, {useEffect} from 'react';
+import './answerForm.css';
+import React, {Component} from 'react';
 import {Link, useHistory} from "react-router-dom";
+import FinkiQAService from "../../../repository/finkiqaRepository";
 
-const AnswerForm = (props) => {
-    const history = useHistory();
-    const [formData, updateFormData] = React.useState({
-        explanation: "",
-        likes: 0,
-        dislikes: 0,
-        questionId: props.questionId,
-        username: "mirjana.mirjanovska"
-    })
+class AnswerForm extends Component {
 
-    const handleChange = (e) => {
-        updateFormData({
-            ...formData,
-            [e.target.name]: e.target.value.trim()
+    constructor(props) {
+        super(props);
+
+        this.onChangeField = this.onChangeField.bind(this);
+        this.state = {
+            explanation: "",
+            likes: 0,
+            dislikes: 0,
+            questionId: this.props.questionId,
+            username: "mirjana.mirjanovska",
+            answers: []
+        }
+    }
+
+    onChangeField(e) {
+        this.setState({
+            [e.target.name]: e.target.value
         });
     }
 
-    const onFormSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData);
-        const explanation = formData.explanation;
-        const likes = formData.likes;
-        const dislikes = formData.dislikes;
-        const questionId = formData.questionId;
-        const username = formData.username;
-        props.onAddAnswer(explanation, likes, dislikes, questionId, username);
-        history.push(`/questions/${questionId}/details`);
+    saveAnswer = (explanation, likes, dislikes, questionId, username) => {
+        this.props.onAddAnswer(explanation, likes, dislikes, questionId, username);
     }
 
-    useEffect(() => {
-        if (props.answer.explanation !== undefined) {
-            document.getElementById('explanation').innerHTML = props.answer.explanation;
-        }
-    })
+    editAnswer = (id, explanation, likes, dislikes, questionId, username) => {
+        console.log(id);
+        console.log(explanation)
+        console.log(likes)
+        console.log(dislikes)
+        console.log(this.props.questionId);
+        console.log(questionId)
+        console.log(username)
+        this.props.onEditAnswer(id, explanation, likes, dislikes, questionId, username);
+        this.props.toogleButton();
+    }
 
-    return(
-        <div className="container">
-            <div className="row">
-                <div className="col-md-5">
-                    <form onSubmit={onFormSubmit}>
+    getAnswersFromQuestionId = (id) => {
+        this.getQuestion(id);
+        FinkiQAService.getAnswersByQuestionId(id)
+            .then((data) => {
+                this.setState({
+                    answers: data.data
+                });
 
-                        <div className="form-group">
-                            <label htmlFor="explanation">Description</label>
-                            <textarea className={"form-control"}
-                                      id="explanation"
-                                      name="explanation"
-                                      onChange={handleChange}
-                                      required></textarea>
-                        </div>
+            });
+    }
 
-                        <button type="submit" className="btn btn-primary">Submit</button>
-                        <Link type="button" className="btn btn-primary" to={"/products"}>Back</Link>
-                    </form>
+    render() {
+        return (
+            <div className={"container mt-4"}>
+                <div className="row">
+                    <div className="col-md-5">
+                        <form onSubmit={(e) => {e.preventDefault(); (this.props.answer !== undefined) ?
+                            this.editAnswer(this.props.answer.id, this.state.explanation, this.state.likes, this.state.dislikes, this.state.questionId, this.state.username) :
+                            this.saveAnswer(this.state.explanation, this.state.likes, this.state.dislikes, this.props.questionId, this.state.username) }}>
+
+                            <div className="form-group">
+                                <label htmlFor="explanation">Description</label>
+                                <textarea className={"form-control answer-text-box"}
+                                          id="explanation"
+                                          name="explanation"
+                                          onChange={this.onChangeField}
+                                          value={this.state.explanation}
+                                          required></textarea>
+                            </div>
+
+                            <div>
+                                {console.log(this.props)}
+                            </div>
+
+                            <button type="submit" className="btn btn-primary">Submit</button>
+                            <Link type="button" className="btn btn-primary" to={"/questions"}>Back</Link>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
+
+    componentDidMount() {
+        if (this.props.answer !== undefined) {
+            this.state.explanation = this.props.answer.explanation;
+            this.state.likes = this.props.answer.likes;
+            this.state.dislikes = this.props.answer.dislikes;
+            console.log(this.props.answer.question.id);
+            this.state.questionId = this.props.answer.question.id;
+        }
+    }
 }
 
 export default AnswerForm;

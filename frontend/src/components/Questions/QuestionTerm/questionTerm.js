@@ -26,8 +26,7 @@ const questionTerm = (props) => {
                         <a title={"Delete"} className={"btn btn-danger"}
                            onClick={() => {props.onDelete(props.term.id)}}>Delete</a>
                         <Link className={"btn btn-info ml-2"}
-                              onClick={() => props.onEdit(props.term.id)}
-                              to={'/questions/add'}>
+                              to={`/questions/form/${props.term.id}`}>
                             Edit
                         </Link>
                     </div>
@@ -45,8 +44,8 @@ const questionTerm = (props) => {
                                 <p className={"reviews-header"}>Reviews</p>
                             </div>
                             <div className={"card-body"}>
-                                <div><button onClick={() => {props.likeQuestion(props.term.id)}} ><FontAwesomeIcon icon={faThumbsUp}/> </button> <span className={"small-icon"}>{props.term.likes}</span></div>
-                                <div><button onClick={() => {props.dislikeQuestion(props.term.id)}} ><FontAwesomeIcon icon={faThumbsDown}/> </button> <span className={"small-icon"}>{props.term.dislikes}</span></div>
+                                <div><FontAwesomeIcon onMouseOut={(e) => {e.target.classList.remove("change-color")}} onMouseOver={(e) => { console.log(e.target); e.target.classList.add("change-color")}} onClick={() => {props.likeQuestion(props.term.id)}}  icon={faThumbsUp}/>  <span className={"small-icon"}>{props.term.likes}</span></div>
+                                <div><FontAwesomeIcon onMouseOut={(e) => {e.target.classList.remove("change-color")}} onMouseOver={(e) => { console.log(e.target); e.target.classList.add("change-color")}} onClick={() => {props.likeQuestion(props.term.id)}}  icon={faThumbsDown}/> <span className={"small-icon"}>{props.term.dislikes}</span></div>
                             </div>
                         </div>
                     </div>

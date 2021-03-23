@@ -20,6 +20,13 @@ public class AnswerRestController {
         this.answerService = answerService;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Answer> findById(@PathVariable Long id) {
+        return this.answerService.getAnswerById(id)
+                .map(answer -> ResponseEntity.ok().body(answer))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/add")
     public ResponseEntity<Answer> save(@RequestBody AnswerDto answerDto) {
         return this.answerService.save(answerDto.getExplanation(), answerDto.getLikes(), answerDto.getDislikes(), answerDto.getQuestionId(), answerDto.getUserId())
