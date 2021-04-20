@@ -1,5 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faSignInAlt, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 
 const header = (props) => {
     return (
@@ -12,20 +14,40 @@ const header = (props) => {
 
             <div className="collapse navbar-collapse" id="navbarTogglerDemo03">
                 <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
-                    <li className="nav-item active">
+                    <li className="nav-item">
                         <Link className="nav-link" to={"/questions"}>Home</Link>
-                    </li>
+                    </li> {props.currentUser?.username !== undefined &&
                     <li className="nav-item">
                         <Link className="nav-link" to={`/questions/form/${null}`} onClick={() => props.isAddMode(true)}>Ask question</Link>
-                    </li>
+                    </li> }{props.currentUser?.username === undefined &&
+                    <li className="nav-item">
+                        <Link className="nav-link" to={`/login`}>Ask question</Link>
+                    </li> }{ props.currentUser?.roles?.includes("ROLE_ADMIN") &&
                     <li className="nav-item">
                         <Link className="nav-link" to={"/tags"}>Tags</Link>
-                    </li>
+                    </li> }
                 </ul>
-                <form className="form-inline my-2 my-lg-0">
-                    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                <ul className="navbar-nav mt-2 mt-lg-0 float-right">
+                    { props.currentUser?.username === undefined &&
+                    <li className="nav-item">
+                        <Link className="nav-link" to={"/login"}>Log in<FontAwesomeIcon className={'ml-2'} icon={faSignInAlt}/></Link>
+                    </li>} { props.currentUser?.username === undefined &&
+                    <li className="nav-item">
+                        <Link className="nav-link" to={"/register"}>Register</Link>
+                    </li>} { props.currentUser?.username !== undefined &&
+                    <li className="nav-item">
+                        <Link className="nav-link" to={"/profile"}>{props.currentUser?.username}<FontAwesomeIcon className={'ml-2'} icon={faUser}/></Link>
+                    </li>} { props.currentUser?.username !== undefined &&
+                    <li className="nav-item">
+                        <Link to={"/questions"} className="nav-link" onClick={() => {props.logOut(); window.location.reload();}}>
+                            LogOut
+                        <FontAwesomeIcon className={'ml-2'} icon={faSignOutAlt}/></Link>
+                    </li> }
+                </ul>
+                {/*<form className="form-inline my-2 my-lg-0">*/}
+                {/*    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>*/}
+                {/*        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>*/}
+                {/*</form>*/}
             </div>
         </nav>
     );

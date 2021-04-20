@@ -11,20 +11,20 @@ public class QuestionDto {
     private String description;
     private Long likes;
     private Long dislikes;
-    private String username;
+    private String userId;
     private List<String> tags;
 
     public QuestionDto(String title,
                        String description,
                        Long likes,
                        Long dislikes,
-                       String username,
+                       String userId,
                        List<String> tags) {
         this.title = title;
         this.description = description;
         this.likes = likes;
         this.dislikes = dislikes;
-        this.username = username;
+        this.userId = userId;
         this.tags = tags;
     }
 }

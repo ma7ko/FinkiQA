@@ -3,6 +3,7 @@ package mk.ukim.finki.finkiqa.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,6 +20,12 @@ public class Answer {
 
     @ManyToOne
     private Question question;
+
+    @ManyToMany
+    private List<User> likedByUsers;
+
+    @ManyToMany
+    private List<User> dislikedByUsers;
 
     @OneToOne
     private User user;

@@ -4,8 +4,10 @@ import QuestionTerm from '../QuestionTerm/questionTerm';
 
 const questions = (props) => {
     return (
-        <div className={"container mm-4 mt-5"}>
+        <div className={"container mt-5"}>
             <div className={"row"}>
+                <div className={"col-md-1"}></div>
+                <div className={"col-md-9"}>
                 {
                     props.questions.map((term) => {
                         return (
@@ -14,11 +16,14 @@ const questions = (props) => {
                                           onEdit={props.onEdit}
                                           showQuestionDetails={props.showQuestionDetails}
                                           likeQuestion={props.likeQuestion}
-                                          dislikeQuestion={props.dislikeQuestion}/>
+                                          dislikeQuestion={props.dislikeQuestion}
+                                          currentUser={props.currentUser}/>
                         );
                     })
                 }
 
+                </div>
+                <div className={"col-md-1"}></div>
             </div>
         </div>
     );

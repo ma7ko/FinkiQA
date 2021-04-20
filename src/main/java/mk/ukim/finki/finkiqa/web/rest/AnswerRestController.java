@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://localhost:3000")
 @RequestMapping("/api/answers")
 public class AnswerRestController {
 
@@ -50,16 +50,16 @@ public class AnswerRestController {
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    @GetMapping("/{id}/like")
-    public ResponseEntity<Answer> likeAnswer(@PathVariable Long id) {
-        return this.answerService.likeAnswerById(id)
+    @GetMapping("/{id}/like-by/{username}")
+    public ResponseEntity<Answer> likeAnswer(@PathVariable Long id, @PathVariable String username) {
+        return this.answerService.likeAnswerById(id, username)
                 .map(answer -> ResponseEntity.ok().body(answer))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}/dislike")
-    public ResponseEntity<Answer> dislikeAnswer(@PathVariable Long id) {
-        return this.answerService.dislikeAnswerById(id)
+    @GetMapping("/{id}/dislike-by/{username}")
+    public ResponseEntity<Answer> dislikeAnswer(@PathVariable Long id, @PathVariable String username) {
+        return this.answerService.dislikeAnswerById(id, username)
                 .map(answer -> ResponseEntity.ok().body(answer))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -14,7 +14,7 @@ class AnswerForm extends Component {
             likes: 0,
             dislikes: 0,
             questionId: this.props.questionId,
-            username: "mirjana.mirjanovska",
+            username: this.props.currentUser.username,
             answers: []
         }
     }
@@ -27,6 +27,7 @@ class AnswerForm extends Component {
 
     saveAnswer = (explanation, likes, dislikes, questionId, username) => {
         this.props.onAddAnswer(explanation, likes, dislikes, questionId, username);
+        this.setState({explanation: ""});
     }
 
     editAnswer = (id, explanation, likes, dislikes, questionId, username) => {
@@ -56,14 +57,16 @@ class AnswerForm extends Component {
         return (
             <div className={"container mt-4"}>
                 <div className="row">
-                    <div className="col-md-5">
+                    <div className="col-md-5 ml-5">
                         <form onSubmit={(e) => {e.preventDefault(); (this.props.answer !== undefined) ?
                             this.editAnswer(this.props.answer.id, this.state.explanation, this.state.likes, this.state.dislikes, this.state.questionId, this.state.username) :
                             this.saveAnswer(this.state.explanation, this.state.likes, this.state.dislikes, this.props.questionId, this.state.username) }}>
 
                             <div className="form-group">
                                 <label htmlFor="explanation">Description</label>
-                                <textarea className={"form-control answer-text-box"}
+                                <textarea rows={"4"}
+                                          cols={"100"}
+                                    className={"form-control answer-text-box"}
                                           id="explanation"
                                           name="explanation"
                                           onChange={this.onChangeField}
@@ -75,8 +78,9 @@ class AnswerForm extends Component {
                                 {console.log(this.props)}
                             </div>
 
-                            <button type="submit" className="btn btn-primary">Submit</button>
-                            <Link type="button" className="btn btn-primary" to={"/questions"}>Back</Link>
+                            <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                            { this.props.answer === undefined &&
+                            <Link type="button" className="btn btn-primary mr-2" to={"/questions"}>Back</Link>}
                         </form>
                     </div>
                 </div>

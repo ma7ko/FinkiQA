@@ -47,9 +47,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public Optional<Question> save(String title, String description, Long likes, Long dislikes, String username, List<String> tags) {
-        User user = this.userRepository.findById(username)
-                .orElseThrow(() -> new IllegalArgumentException(username));
+    public Optional<Question> save(String title, String description, Long likes, Long dislikes, String userId, List<String> tags) {
+        User user = this.userRepository.findByUsername(userId)
+                .orElseThrow(() -> new IllegalArgumentException());
 
         List<Long> convertedTags = tags.stream().map(Long::parseLong).collect(Collectors.toList());
 
@@ -59,10 +59,10 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Optional<Question> edit(Long Id, String title, String description, Long likes, Long dislikes, String username, List<String> tags) {
+    public Optional<Question> edit(Long Id, String title, String description, Long likes, Long dislikes, String userId, List<String> tags) {
         Question question = this.getQuestionById(Id).orElseThrow(IllegalAccessError::new);
-        User user = this.userRepository.findById(username)
-                .orElseThrow(() -> new IllegalArgumentException(username));
+        User user = this.userRepository.findByUsername(userId)
+                .orElseThrow(() -> new IllegalArgumentException());
 
         List<Tag> selectedTags = new ArrayList<>();
 
@@ -85,25 +85,52 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Optional<Question> likeQuestionById(Long id) {
-        Question question = this.getQuestionById(id).orElseThrow(IllegalAccessError::new);
+    public Optional<Question> likeQuestionById(Long id, String username) {
+        Question question = this.getQuestionById(id).orElseThrow(IllegalArgumentException::new);
+        User user = this.userRepository.findByUsername(username).orElseThrow(IllegalArgumentException::new);
+        List<User> usersLiked = question.getLikedByUsers();
         Long currentLikes = question.getLikes();
 
-        currentLikes += 1;
+        if (!usersLiked.contains(user)) {
+            currentLikes += 1;
+            usersLiked.add(user);
+            question.setLikedByUsers(usersLiked);
+        } else {
+            currentLikes -= 1;
+            usersLiked.remove(user);
+            question.setLikedByUsers(usersLiked);
+        }
 
         question.setLikes(currentLikes);
         return Optional.of(this.questionRepository.save(question));
     }
 
     @Override
-    public Optional<Question> dislikeQuestionById(Long id) {
-        Question question = this.getQuestionById(id).orElseThrow(IllegalAccessError::new);
+    public Optional<Question> dislikeQuestionById(Long id, String username) {
+        Question question = this.getQuestionById(id).orElseThrow(IllegalArgumentException::new);
+        User user = this.userRepository.findByUsername(username).orElseThrow(IllegalArgumentException::new);
+        List<User> usersDisliked = question.getDislikedByUsers();
         Long currentDislikes = question.getDislikes();
 
-        currentDislikes += 1;
+        if (!usersDisliked.contains(user)) {
+            currentDislikes += 1;
+            usersDisliked.add(user);
+            question.setDislikedByUsers(usersDisliked);
+        } else {
+            currentDislikes -= 1;
+            usersDisliked.remove(user);
+            question.setDislikedByUsers(usersDisliked);
+        }
 
         question.setDislikes(currentDislikes);
         return Optional.of(this.questionRepository.save(question));
+    }
+
+    @Override
+    public Optional<List<Tag>> searchTags(String pattern) {
+        List<Tag> foundTags = this.tagRepository.findAllByNameContains(pattern);
+
+        return Optional.of(foundTags);
     }
 
     @Override

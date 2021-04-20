@@ -8,30 +8,40 @@ import Questions from '../Questions/QuestionsList/questions';
 import QuestionsForm from "../Questions/QuestionsForm/questionsForm";
 import QuestionDetails from "../Questions/QuestionDetails/questionDetails";
 import Tags from "../Tags/TagsList/tags";
+import Login from "../LogIn/logIn";
+import Register from "../Register/register";
+import Profile from "../Profile/profile";
+import AuthService from "../../repository/auth";
 
 class App extends Component {
 
   constructor(props) {
     super(props);
+    this.logOut = this.logOut.bind(this);
     this.state = {
       questions: [],
       tags: [],
       selectedQuestion: {},
         answers: [],
         currentTags: [],
-        currentAnswer: {}
+        currentAnswer: {},
+        currentUser: {},
+        searchedTags: []
     }
   }
 
   render() {
     return (
         <Router>
-          <Header isAddMode={this.isAdd}/>
+          <Header logOut={this.logOut} currentUser={this.state.currentUser} isAddMode={this.isAdd}/>
           <main>
             <div className={"container"}>
               <Route path={"/questions/form/:id"} exact render={(props) =>
                   <QuestionsForm
-                  tags={this.state.tags} isAddMode={this.state.selectedQuestion === undefined}
+                  tags={this.state.tags}
+                  searchedTags={this.state.searchedTags}
+                  isAddMode={this.state.selectedQuestion === undefined}
+                  currentUser={this.state.currentUser}
                   onAddQuestion={this.addQuestion}
                                  onEditQuestion={this.editQuestion}
                   onSubmitted={this.loadQuestions}
@@ -47,6 +57,9 @@ class App extends Component {
                                        onEditAnswer={this.editAnswer}
                                        likeAnswer={this.likeAnswer}
                                        dislikeAnswer={this.dislikeAnswer}
+                                       likeQuestion={this.likeQuestionFromDetails}
+                                       dislikeQuestion={this.dislikeQuestionFromDetails}
+                                       currentUser={this.state.currentUser}
                                        props={props}/>}/>
               <Route path={"/questions"} exact render={() =>
                   <Questions questions={this.state.questions}
@@ -54,11 +67,17 @@ class App extends Component {
                              onEdit={this.getQuestion}
                              showQuestionDetails={this.getAnswersFromQuestionId}
                              likeQuestion={this.likeQuestion}
-                             dislikeQuestion={this.dislikeQuestion}/> }/>
+                             dislikeQuestion={this.dislikeQuestion}
+                             currentUser={this.state.currentUser}/> }/>
               <Route path={"/tags"} exact render={() =>
                   <Tags tags={this.state.tags}
                         onAddTag={this.addTag}
                         deleteTag={this.deleteTag}/> } />
+                <Route path="/login" exact render={(props) =>
+                    <Login setCurrentUser={this.setCurrentUser} props={props}/> } />
+                <Route exact path="/register" component={Register} />
+                <Route path="/profile" exact render={() =>
+                    <Profile currentUser={this.state.currentUser}/> } />
               <Redirect to={"/questions"}/>
             </div>
           </main>
@@ -158,33 +177,59 @@ class App extends Component {
           });
   }
 
-  likeAnswer = (id, questionId) => {
-      FinkiQAService.likeAnswer(id)
+  likeAnswer = (id, questionId, userId) => {
+      FinkiQAService.likeAnswer(id, userId)
           .then(() => {
               this.getAnswersFromQuestionId(questionId);
           });
   }
 
-  dislikeAnswer = (id, questionId) => {
-      FinkiQAService.dislikeAnswer(id)
+  dislikeAnswer = (id, questionId, userId) => {
+      FinkiQAService.dislikeAnswer(id, userId)
           .then(() => {
               this.getAnswersFromQuestionId(questionId);
           });
   }
 
-    likeQuestion = (id) => {
-        FinkiQAService.likeQuestion(id)
+    likeQuestion = (id, userId) => {
+        FinkiQAService.likeQuestion(id, userId)
             .then(() => {
                 this.loadQuestions();
             });
     }
 
-    dislikeQuestion = (id) => {
-        FinkiQAService.dislikeQuestion(id)
+    dislikeQuestion = (id, userId) => {
+        FinkiQAService.dislikeQuestion(id, userId)
             .then(() => {
                 this.loadQuestions();
             });
     }
+
+    likeQuestionFromDetails = (id, userId) => {
+        FinkiQAService.likeQuestion(id, userId)
+            .then(() => {
+                this.loadQuestions();
+                this.getQuestion(id);
+            });
+    }
+
+    dislikeQuestionFromDetails = (id, userId) => {
+        FinkiQAService.dislikeQuestion(id, userId)
+            .then(() => {
+                this.loadQuestions();
+                this.getQuestion(id);
+            });
+    }
+
+    findTagsContaining = (pattern) => {
+        FinkiQAService.findTagsContaining(pattern)
+            .then((data) => {
+                this.setState({
+                    searchedTags: data.data
+                });
+            });
+    }
+
 
     isAdd = (boolean) => {
       if (boolean) {
@@ -203,7 +248,26 @@ class App extends Component {
             });
     }
 
+    setCurrentUser = (user) => {
+      this.setState({
+          currentUser: user
+      });
+    }
+
+    logOut() {
+        AuthService.logout();
+    }
+
   componentDidMount() {
+      const user = AuthService.getCurrentUser();
+
+      if (user) {
+          this.setState({
+              currentUser: user
+          });
+      }
+
+      console.log(this.state.currentUser);
     this.loadQuestions();
     this.loadTags();
   }

@@ -10,8 +10,8 @@ public interface AnswerService {
     List<Answer> getAnswersFromQuestionId(Long id);
     Optional<Answer> getAnswerById(Long Id);
     Optional<Answer> save(String explanation, Long likes, Long dislikes, Long questionId, String userId);
-    Optional<Answer> edit(Long Id, String explanation, Long likes, Long dislikes, Long questionId, String username);
-    Optional<Answer> likeAnswerById(Long id);
-    Optional<Answer> dislikeAnswerById(Long id);
+    Optional<Answer> edit(Long Id, String explanation, Long likes, Long dislikes, Long questionId, String userId);
+    Optional<Answer> likeAnswerById(Long id, String username);
+    Optional<Answer> dislikeAnswerById(Long id, String username);
     void deleteById(Long Id);
 }

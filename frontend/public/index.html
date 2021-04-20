@@ -27,8 +27,20 @@
     <title>FINKI Q&A</title>
   </head>
   <body>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId            : '1159945341131713',
+        autoLogAppEvents : true,
+        xfbml            : true,
+        version          : 'v10.0'
+      });
+    };
+  </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

@@ -3,6 +3,7 @@ package mk.ukim.finki.finkiqa.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -26,6 +27,12 @@ public class Question {
     @ManyToMany
     private List<Tag> tags;
 
+    @ManyToMany
+    private List<User> likedByUsers;
+
+    @ManyToMany
+    private List<User> dislikedByUsers;
+
     public Question() {
     }
 
@@ -36,5 +43,6 @@ public class Question {
         this.dislikes = dislikes;
         this.user = user;
         this.tags = tags;
+        this.likedByUsers = new ArrayList<>();
     }
 }

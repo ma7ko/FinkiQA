@@ -47,13 +47,13 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public Optional<Answer> save(String explanation, Long likes, Long dislikes, Long questionId, String userId) {
         Question question = this.questionRepository.findById(questionId).orElseThrow(IllegalAccessError::new);
-        User user = this.userRepository.findById(userId).orElseThrow(IllegalAccessError::new);
+        User user = this.userRepository.findByUsername(userId).orElseThrow(IllegalAccessError::new);
 
         return Optional.of(this.answerRepository.save(new Answer(explanation, likes, dislikes, question, user)));
     }
 
     @Override
-    public Optional<Answer> edit(Long Id, String explanation, Long likes, Long dislikes, Long questionId, String username) {
+    public Optional<Answer> edit(Long Id, String explanation, Long likes, Long dislikes, Long questionId, String userId) {
         Answer answer = this.answerRepository.findById(Id).orElseThrow(IllegalAccessError::new);
 
         answer.setExplanation(explanation);
@@ -62,7 +62,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         Question question = this.questionRepository.findById(questionId).orElseThrow(IllegalAccessError::new);
         answer.setQuestion(question);
-        User user = this.userRepository.findById(username).orElseThrow(IllegalAccessError::new);
+        User user = this.userRepository.findByUsername(userId).orElseThrow(IllegalAccessError::new);
         answer.setUser(user);
 
         return Optional.of(this.answerRepository.save(answer));
@@ -70,22 +70,42 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public Optional<Answer> likeAnswerById(Long id) {
+    public Optional<Answer> likeAnswerById(Long id, String username) {
         Answer answer = this.answerRepository.findById(id).orElseThrow(IllegalAccessError::new);
+        User user = this.userRepository.findByUsername(username).orElseThrow(IllegalArgumentException::new);
+        List<User> usersLiked = answer.getLikedByUsers();
         Long currentLikes = answer.getLikes();
 
-        currentLikes += 1;
+        if (!usersLiked.contains(user)) {
+            currentLikes += 1;
+            usersLiked.add(user);
+            answer.setLikedByUsers(usersLiked);
+        } else {
+            currentLikes -= 1;
+            usersLiked.remove(user);
+            answer.setLikedByUsers(usersLiked);
+        }
 
         answer.setLikes(currentLikes);
         return Optional.of(this.answerRepository.save(answer));
     }
 
     @Override
-    public Optional<Answer> dislikeAnswerById(Long id) {
+    public Optional<Answer> dislikeAnswerById(Long id, String username) {
         Answer answer = this.answerRepository.findById(id).orElseThrow(IllegalAccessError::new);
+        User user = this.userRepository.findByUsername(username).orElseThrow(IllegalArgumentException::new);
+        List<User> usersDisliked = answer.getDislikedByUsers();
         Long currentDislikes = answer.getDislikes();
 
-        currentDislikes += 1;
+        if (!usersDisliked.contains(user)) {
+            currentDislikes += 1;
+            usersDisliked.add(user);
+            answer.setDislikedByUsers(usersDisliked);
+        } else {
+            currentDislikes -= 1;
+            usersDisliked.remove(user);
+            answer.setDislikedByUsers(usersDisliked);
+        }
 
         answer.setDislikes(currentDislikes);
         return Optional.of(this.answerRepository.save(answer));
