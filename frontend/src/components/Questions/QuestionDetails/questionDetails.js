@@ -1,68 +1,134 @@
-import React from 'react';
+import React, {Component, useState} from 'react';
 import AnswerTerm from '../../Answers/AnswerTerm/answerTerm';
 import AnswerForm from '../../Answers/AnswerForm/answerFrom';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faThumbsDown, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
+import {faFeatherAlt, faThumbsDown, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
 import '../QuestionTerm/questions.css';
+import Pagination from "../../Pagination/pagination";
 
-const questionDetails = (props) => {
-    return (
-        <div className={"container"}>
-            <div className={"row m-2"}>
-                <div className={"col-md-2"}>
-                    {console.log(props.props.match.params.id)}
-                </div>
-                <div className={"col-md-8"}>
-                    <div className={"card"}>
-                        <h5 className={"card-header"}>{props.question.title} - {props.question.user?.username}</h5>
-                        <div className={"card-body"}>
-                            <div className={"row"}>
-                                <div className={"col-md-8"}>
-                                    {props.question.description}
-                                </div>
+class QuestionDetails extends Component {
+
+    constructor(props) {
+        super(props);
+        this.setCurrentPage = this.setCurrentPage.bind(this);
+
+        this.state = {
+            currentPage: 1,
+            indexOfLastPost: 2,
+            indexOfFirstPost: 0,
+            postsPerPage: 2,
+        }
+    }
+
+    setCurrentPage(page) {
+        this.setState({
+            currentPage: page,
+            indexOfLastPost: page * this.state.postsPerPage,
+            indexOfFirstPost: page * this.state.postsPerPage - this.state.postsPerPage,
+        });
+        console.log(page * this.state.postsPerPage);
+        console.log(this.state.indexOfLastPost);
+    }
 
 
-                                <div className={"col-md-4"}>
-                                    <div className={"small-icon"}>
-                                        <div className={"items-icon"}>
-                                            <div className={'innermost'}><FontAwesomeIcon className={props.question?.likedByUsers?.map(term => term.username).includes(props.currentUser?.username) ? "change-color custom-size" : 'custom-size'} onMouseOut={(e) => {!props.question?.likedByUsers.map(term => term.username).includes(props.currentUser?.username) && e.target.classList.remove("change-color")}} onMouseOver={(e) => { console.log(e.target); e.target.classList.add("change-color")}} onClick={(e) => {props.likeQuestion(props.question.id, props.currentUser?.username)}}  icon={faThumbsUp}/></div>
-                                            <div className={'innermost'}>{props.question.likes}</div>
-                                        </div>
-                                        <div className={"items-icon"}>
-                                            <div className={'innermost'}><FontAwesomeIcon className={props.question?.dislikedByUsers?.map(term => term.username).includes(props.currentUser?.username) ? "change-color custom-size" : 'custom-size'} onMouseOut={(e) => {!props.question?.dislikedByUsers?.map(term => term.username).includes(props.currentUser?.username) && e.target.classList.remove("change-color")}} onMouseOver={(e) => { console.log(e.target); e.target.classList.add("change-color")}} onClick={(e) => {props.dislikeQuestion(props.question.id, props.currentUser?.username)}}  icon={faThumbsDown}/></div>
-                                            <div className={'innermost'}>{props.question.dislikes}</div>
+    render() {
+
+        return (
+            <div className={"container"}>
+                <div className={"row"}>
+                    <div className={"col-md-6"}>
+                        <div className={"card mt-4"}>
+                            <h5 className={"card-header"}>{this.props.question.title} - {this.props.question.user?.username}</h5>
+                            <div className={"card-body"}>
+                                <div className={"row"}>
+                                    <div className={"col-md-8"}>
+                                        {this.props.question.description}
+                                    </div>
+
+
+                                    <div className={"col-md-4"}>
+                                        <div className={"small-icon"}>
+                                            <div className={"items-icon"}>
+                                                <div className={'innermost'}><FontAwesomeIcon
+                                                    className={this.props.question?.likedByUsers?.map(term => term.username).includes(this.props.currentUser?.username) ? "change-color custom-size" : 'custom-size'}
+                                                    onMouseOut={(e) => {
+                                                        !this.props.question?.likedByUsers.map(term => term.username).includes(this.props.currentUser?.username) && e.target.classList.remove("change-color")
+                                                    }} onMouseOver={(e) => {
+                                                    console.log(e.target);
+                                                    e.target.classList.add("change-color")
+                                                }} onClick={(e) => {
+                                                    this.props.likeQuestion(this.props.question.id, this.props.currentUser?.username)
+                                                }} icon={faThumbsUp}/></div>
+                                                <div className={'innermost'}>{this.props.question.likes}</div>
+                                            </div>
+                                            <div className={"items-icon"}>
+                                                <div className={'innermost'}><FontAwesomeIcon
+                                                    className={this.props.question?.dislikedByUsers?.map(term => term.username).includes(this.props.currentUser?.username) ? "change-color custom-size" : 'custom-size'}
+                                                    onMouseOut={(e) => {
+                                                        !this.props.question?.dislikedByUsers?.map(term => term.username).includes(this.props.currentUser?.username) && e.target.classList.remove("change-color")
+                                                    }} onMouseOver={(e) => {
+                                                    console.log(e.target);
+                                                    e.target.classList.add("change-color")
+                                                }} onClick={(e) => {
+                                                    this.props.dislikeQuestion(this.props.question.id, this.props.currentUser?.username)
+                                                }} icon={faThumbsDown}/></div>
+                                                <div className={'innermost'}>{this.props.question.dislikes}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div> </div>
+                            </div>
+                        </div>
+                        <div className={'row'}>
+                            <div className={'col-md-12 mt-4'}>
+                                <div className={"container mt-4"}>
+                                    <AnswerForm questionId={this.props.props.match.params.id}
+                                                numberOfRows={"7"}
+                                                onAddAnswer={this.props.onAddAnswer}
+                                                currentUser={this.props.currentUser}
+                                                props={this.props.props}/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className={"container"}>
-                        <AnswerForm questionId={props.props.match.params.id}
-                                    onAddAnswer={props.onAddAnswer}
-                                    currentUser={props.currentUser}
-                                    props={props.props}/>
+                    <div className={"col-md-6"}>
+                        <div className={'mt-4'}>
+                            <div className={'small-icon'}>
+                                <h4>Answers</h4>
+                                <div><Pagination mainPage={false} totalPosts={this.props.answers?.length} postsPerPage={this.state.postsPerPage} currentPage={this.state.currentPage} paginate={this.setCurrentPage}/></div>
+                            </div>
+                        </div>
+                            <div className={"container box-fix"}>
+                            {console.log(this.props.answers.slice(this.state.indexOfFirstPost, this.state.indexOfLastPost))}
+                            {console.log(this.props.answers)}
+                            
+                            {this.props.answers.slice(this.state.indexOfFirstPost, this.state.indexOfLastPost).map((term) => {
+                                return <AnswerTerm key={`${term.id}${term.question.id}`}
+                                                    term={term}
+                                                   questionId={this.props.props.match.params.id}
+                                                   onAnswerDelete={this.props.onAnswerDelete}
+                                                   onAnswerEdit={this.props.onAnswerEdit}
+                                                   onEditAnswer={this.props.onEditAnswer}
+                                                   onAddAnswer={this.props.onAddAnswer}
+                                                   likeAnswer={this.props.likeAnswer}
+                                                   dislikeAnswer={this.props.dislikeAnswer}
+                                                   currentUser={this.props.currentUser}
+                                                   props={this.props.props}/>
+                            })}
+                            
+                                {this.props.answers?.length === 0 && <div className={'not-found text-center'}><FontAwesomeIcon size={'4x'} icon={faFeatherAlt}/> <p className={'text-center'}>No answers yet</p></div>}
+                        </div>
+                        {console.log(this.props.answers)}
                     </div>
-                    <div className={"container"}>
-                        {props.answers.map((term) => {
-                            return <AnswerTerm term={term}
-                                               questionId={props.props.match.params.id}
-                                               onAnswerDelete={props.onAnswerDelete}
-                                               onAnswerEdit={props.onAnswerEdit}
-                                               onEditAnswer={props.onEditAnswer}
-                                               onAddAnswer={props.onAddAnswer}
-                                               likeAnswer={props.likeAnswer}
-                                               dislikeAnswer={props.dislikeAnswer}
-                                               currentUser={props.currentUser}
-                                               props={props.props}/>
-                        })}
-                    </div>
-                </div>
-                <div className={"col-md-2"}>
-
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
+
+    componentDidMount() {
+    }
+
+
 }
 
-export default questionDetails;
+export default QuestionDetails;

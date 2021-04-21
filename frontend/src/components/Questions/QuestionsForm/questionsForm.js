@@ -5,6 +5,7 @@ import tags from "../../Tags/TagsList/tags";
 import FinkiQAService from "../../../repository/finkiqaRepository";
 import {faCarCrash, faPaperPlane, faTags} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Pagination from "../../Pagination/pagination";
 
 class QuestionsForm extends Component {
     constructor(props) {
@@ -15,6 +16,8 @@ class QuestionsForm extends Component {
         this.getQuestion = this.getQuestion.bind(this);
         this.saveQuestion = this.saveQuestion.bind(this);
         this.editQuestion = this.editQuestion.bind(this);
+        this.setCurrentPage = this.setCurrentPage.bind(this);
+        this.setCurrentPageSearch = this.setCurrentPageSearch.bind(this);
 
         this.state = {
             title: "",
@@ -24,11 +27,42 @@ class QuestionsForm extends Component {
             username: this.props.currentUser.username,
             tags: [],
             currentQuestion: {},
-            searchedTags: []
+            searchedTags: [],
+            currentPage: 1,
+            indexOfLastPost: 5,
+            indexOfFirstPost: 0,
+            postsPerPage: 5,
+            currentPageSearch: 1,
+            indexOfLastPostSearch: 5,
+            indexOfFirstPostSearch: 0,
+            postsPerPageSearch: 5
         }
     }
 
+    setCurrentPageSearch(page) {
+        this.setState({
+            currentPageSearch: page,
+            indexOfLastPostSearch: page * this.state.postsPerPageSearch,
+            indexOfFirstPostSearch: page * this.state.postsPerPageSearch - this.state.postsPerPageSearch,
+        });
+        console.log(page * this.state.postsPerPage);
+        console.log(this.state.indexOfLastPost);
+    }
+
+    setCurrentPage(page) {
+        this.setState({
+            currentPage: page,
+            indexOfLastPost: page * this.state.postsPerPage,
+            indexOfFirstPost: page * this.state.postsPerPage - this.state.postsPerPage,
+        });
+        console.log(page * this.state.postsPerPage);
+        console.log(this.state.indexOfLastPost);
+    }
+
     onChangeField(e) {
+        console.log(e.target.name);
+        console.log(e.target.value);
+        console.log(e.target.value.trim());
         this.setState({
             [e.target.name]: e.target.value.trim()
         });
@@ -40,7 +74,9 @@ class QuestionsForm extends Component {
                 .then((data) => {
                     console.log(data);
                     this.setState({
-                        searchedTags: data.data
+                        searchedTags: data.data,
+                        indexOfLastPostSearch: 5,
+                        indexOfFirstPostSearch: 0
                     });
                 });
         }
@@ -101,11 +137,17 @@ class QuestionsForm extends Component {
                 return value.id.toString() !== id.toString();
             });
             console.log(this.state.currentQuestion?.tags);
+            if (this.state.currentQuestion?.tags?.length % 5 === 0 && this.state.currentQuestion?.tags?.length > 0) {
+                this.setCurrentPage(this.state.currentPage-1);
+            }
         } else {
             this.state.tags = this.state.tags.filter(function (value, index, arr) {
                 console.log(value.id);
                 return value.id.toString() !== id.toString();
             });
+            if (this.state.tags?.length % 5 === 0 && this.state.tags?.length > 0) {
+                this.setCurrentPage(this.state.currentPage-1);
+            }
         }
 
         let obj = JSON.parse(`{"id": ${id}, "name": "${e.target.innerText}", "description": ${null}}`);
@@ -150,7 +192,7 @@ class QuestionsForm extends Component {
                 <div className="row m-5">
                     <div className="col-md-4">
                         <form onSubmit={(e) => {e.preventDefault(); (this.props.props.match?.params?.id !== "null") ?
-                            this.editQuestion(this.props.props.match.params.id, this.state.currentQuestion.title, this.state.currentQuestion.description, this.state.currentQuestion.likes, this.state.currentQuestion.dislikes, this.state.currentQuestion.user.username, this.state.currentQuestion.tags.map((term) => {return term.id.toString()})) :
+                            this.editQuestion(this.props.props.match.params.id, this.state.title === '' ? this.state.currentQuestion?.title : this.state.title, this.state.description === '' ? this.state.currentQuestion?.description : this.state.description, this.state.currentQuestion.likes, this.state.currentQuestion.dislikes, this.state.currentQuestion.user.username, this.state.currentQuestion.tags.map((term) => {return term.id.toString()})) :
                             this.saveQuestion(this.state.title, this.state.description, this.state.likes, this.state.dislikes, this.state.username, this.state.tags.map((term) => {return term.id}))}}>
                             <div className="form-group">
                                 <label htmlFor="title">Question Title</label>
@@ -159,7 +201,7 @@ class QuestionsForm extends Component {
                                        id="title"
                                        name="title"
                                        onChange={this.onChangeField}
-                                       value={this.state.currentQuestion?.title}
+                                       defaultValue={this.state.currentQuestion?.title}
                                        required/>
                             </div>
                             <div className="form-group">
@@ -170,7 +212,7 @@ class QuestionsForm extends Component {
                                           id="description"
                                           name="description"
                                           onChange={this.onChangeField}
-                                          value={this.state.currentQuestion?.description}
+                                          defaultValue={this.state.currentQuestion?.description}
                                           required></textarea>
                             </div>
                             <div>{console.log(this.props)}</div>
@@ -191,22 +233,29 @@ class QuestionsForm extends Component {
                                     {console.log(this.state.currentQuestion?.tags?.length)}
                                     {console.log(this.state.tags?.length)}
 
-                                        {(this.state.currentQuestion?.tags?.length === 0 || (this.state.currentQuestion?.tags === undefined && this.state.tags?.length === 0)) && <div className={'text-center not-found'}> <FontAwesomeIcon size='3x' icon={faTags}/>  <p className={'mt-2'}>You do not have any selected tags yet</p></div> }
+                                        {(this.state.currentQuestion?.tags?.length === 0 || (this.state.currentQuestion?.tags === undefined && this.state.tags?.length === 0)) && <div className={'text-center not-found boxes'}> <FontAwesomeIcon size='3x' icon={faTags}/>  <p className={'mt-2'}>You do not have any selected tags yet</p></div> }
 
 
-                                    <div>
+                                    <div>{this.state.currentQuestion?.tags !== undefined &&
+                                        <div className={'boxes'}>
                                         {
-                                            this.state.currentQuestion?.tags?.slice(0,5).map((term) => {
-                                                return <Link id={`${term.id}to`} to={"#"} onClick={(e) => {this.removeTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-primary"}>{term.name}</span></h3> </Link>
-                                            })
+                                            this.state.currentQuestion?.tags?.slice(this.state.indexOfFirstPost,this.state.indexOfLastPost).map((term) => {
+                                                return <Link id={`${term.id}to`} to={"#"} onClick={(e) => {this.removeTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-info"}>{term.name}</span></h3> </Link>
+                                        })
                                         }
+                                        </div>}
+                                        {this.state.currentQuestion?.tags !== undefined && this.state.currentQuestion?.tags?.length > 5 && <div><Pagination mainPage={false} totalPosts={this.state.currentQuestion?.tags?.length} postsPerPage={this.state.postsPerPage} currentPage={this.state.currentPage} paginate={this.setCurrentPage}/></div>}
                                     </div>
-                                    <div>
+                                    <div> {this.state.currentQuestion?.tags === undefined &&
+                                        <div className={'boxes'}>
                                         {
-                                            this.state.tags?.slice(0,5).map((term) => {
-                                                return <Link id={`${term.id}to`} to={"#"} onClick={(e) => {this.removeTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-primary"}>{term.name}</span></h3> </Link>
+                                            this.state.tags?.slice(this.state.indexOfFirstPost,this.state.indexOfLastPost).map((term) => {
+                                                return <Link id={`${term.id}to`} to={"#"} onClick={(e) => {this.removeTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-info"}>{term.name}</span></h3> </Link>
                                             })
                                         }
+                                        </div> }
+                                        {this.state.tags?.length > 5 && <div><Pagination mainPage={false} totalPosts={this.state.tags?.length} postsPerPage={this.state.postsPerPage} currentPage={this.state.currentPage} paginate={this.setCurrentPage}/></div>}
+
                                     </div>
                                 </div>
                             </div>
@@ -238,8 +287,8 @@ class QuestionsForm extends Component {
                                     <div>
                                         {console.log(document.getElementById("search-input")?.value)}
                                         {console.log( this.state?.searchedTags?.length === 0)}
-                                    {   this.state?.searchedTags?.length === 0 && (document.getElementById("search-input")?.value.length === 0 || document.getElementById("search-input")?.value === undefined) &&
-                                        this.props?.tags?.slice(0,5).map((term) => {
+                                        { this.state?.searchedTags?.length === 0 && <div className={'boxes-search'}> {   this.state?.searchedTags?.length === 0 && (document.getElementById("search-input")?.value.length === 0 || document.getElementById("search-input")?.value === undefined) &&
+                                        this.props?.tags?.slice(this.state.indexOfFirstPostSearch,this.state.indexOfLastPostSearch).map((term) => {
                                             // if (props.question !== undefined && props.question.tags !== undefined) {
                                             //     for (let ta = 0; ta < props.question.tags.length; ta++) {
                                             //         console.log(ta);
@@ -252,14 +301,18 @@ class QuestionsForm extends Component {
                                             //         }
                                             //     }
                                             // }
-                                            return <Link id={`${term.id}from`} to={"#"} onClick={(e) => {this.addTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-primary"}>{term.name}</span></h3> </Link>
+                                            return <Link id={`${term.id}from`} to={"#"} onClick={(e) => {this.addTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-info"}>{term.name}</span></h3> </Link>
                                         })
-                                    }
+                                    } </div>}
+                                        { this.state?.searchedTags?.length === 0 && (document.getElementById("search-input")?.value.length === 0 || document.getElementById("search-input")?.value === undefined) && this.props.tags?.length > 5 && <div className={'m-4 fixed'}><Pagination mainPage={false} totalPosts={this.props.tags?.length} postsPerPage={this.state.postsPerPageSearch} currentPage={this.state.currentPageSearch} paginate={this.setCurrentPageSearch}/></div>}
+
                                     </div>
-                                    <div> {
-                                        this.state?.searchedTags?.slice(0,5).map((term) => {
-                                        return <Link id={`${term.id}from`} to={"#"} onClick={(e) => {this.addTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-primary"}>{term.name}</span></h3> </Link>
-                                    }) }
+                                    <div> {this.state?.searchedTags?.length > 0  && <div className={'boxes-search'}> {
+                                        this.state?.searchedTags?.slice(this.state.indexOfFirstPostSearch,this.state.indexOfLastPostSearch).map((term) => {
+                                        return <Link id={`${term.id}from`} to={"#"} onClick={(e) => {this.addTag(e, term.id)}}> <h3><span id="tag" className={"badge badge-info"}>{term.name}</span></h3> </Link>
+                                        }) } </div>}
+
+                                        {this.state?.searchedTags?.length !== 0 && this.state?.searchedTags?.length > 5 && <div className={'m-4 fixed'}><Pagination mainPage={false} totalPosts={this.state.searchedTags?.length} postsPerPage={this.state.postsPerPageSearch} currentPage={this.state.currentPageSearch} paginate={this.setCurrentPageSearch}/></div>}
                                     </div>
                                 </div>
                             </div>

@@ -11,7 +11,7 @@ const tags = (props) => {
                 <div className={"col-md-5"}>
                     {
                         props.tags.map((term) => {
-                            return <div> <h3><span className={"badge badge-primary"}>{term.name}<span id={`${term.id}-tag-remove`} className={"tag-remove-hidden text-primary"} onClick={() => {props.deleteTag(term.id)}}> <FontAwesomeIcon onMouseOut={(e) => {e.target.classList.remove("text-light");}} onMouseOver={(e) => {console.log(e); e.target.classList.add("text-light");}} icon={faTimesCircle}/> </span> </span></h3></div>
+                            return <div> <h3><span className={"badge badge-info"}>{term.name}<span id={`${term.id}-tag-remove`} className={"tag-remove-hidden text-info"} onClick={() => {props.deleteTag(term.id)}}> <FontAwesomeIcon onMouseOut={(e) => {e.target.classList.remove("text-light");}} onMouseOver={(e) => {console.log(e); e.target.classList.add("text-light");}} icon={faTimesCircle}/> </span> </span></h3></div>
                         })
                     }
                 </div>

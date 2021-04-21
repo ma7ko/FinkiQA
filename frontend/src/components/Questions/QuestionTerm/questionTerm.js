@@ -61,7 +61,7 @@ const questionTerm = (props) => {
                     </div>
                 </div>
                 <div> { props.currentUser?.username &&
-                    <Link onClick={() => {props.showQuestionDetails(props.term.id)}}
+                    <Link onClick={() => {props.showQuestionDetails(props.term.id); window.scrollTo(0, 0);}}
                       to={`/questions/${props.term.id}/details`}
                       className="btn btn-primary">See more</Link> }
                 </div>

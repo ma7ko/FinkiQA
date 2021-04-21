@@ -10,8 +10,11 @@ import mk.ukim.finki.finkiqa.service.AnswerService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -40,7 +43,12 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public List<Answer> getAnswersFromQuestionId(Long id) {
-        return this.answerRepository.findAllByQuestionId(id);
+        Comparator<Answer> dateComparator = (c1, c2) -> {
+            if (c1.getPosted().isBefore(c2.getPosted())) return -1;
+            else return 1;
+        };
+
+        return this.answerRepository.findAllByQuestionId(id).stream().sorted(dateComparator.reversed()).collect(Collectors.toList());
     }
 
     @Override

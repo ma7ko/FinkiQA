@@ -15,9 +15,11 @@ import AuthService from "../../repository/auth";
 
 class App extends Component {
 
+
   constructor(props) {
     super(props);
     this.logOut = this.logOut.bind(this);
+    this.setCurrentPage = this.setCurrentPage.bind(this);
     this.state = {
       questions: [],
       tags: [],
@@ -26,8 +28,25 @@ class App extends Component {
         currentTags: [],
         currentAnswer: {},
         currentUser: {},
-        searchedTags: []
+        searchedTags: [],
+        currentPage: 1,
+        postsPerPage: 3,
+        indexOfLastPost: 3,
+        indexOfFirstPost: 0,
+        currentPosts: this.questions?.slice(this.state.indexOfFirstPost, this.state.indexOfLastPost)
     }
+  }
+
+  setCurrentPage(page) {
+      this.setState({
+          currentPage: page,
+          indexOfLastPost: page * this.state.postsPerPage,
+          indexOfFirstPost: page * this.state.postsPerPage - this.state.postsPerPage,
+          currentPosts: this.state.questions?.slice(this.state.indexOfFirstPost, this.state.indexOfLastPost)
+      });
+      window.scrollTo(0, 0);
+      console.log(page * this.state.postsPerPage);
+      console.log(this.state.indexOfLastPost);
   }
 
   render() {
@@ -63,12 +82,18 @@ class App extends Component {
                                        props={props}/>}/>
               <Route path={"/questions"} exact render={() =>
                   <Questions questions={this.state.questions}
+                             currentPage={this.state.currentPage}
+                             firstIndex={this.state.indexOfFirstPost}
+                             lastIndex={this.state.indexOfLastPost}
+                             postsPerPage={this.state.postsPerPage}
+                             totalPosts={this.state.questions.length}
                              onDelete={this.deleteQuestion}
                              onEdit={this.getQuestion}
                              showQuestionDetails={this.getAnswersFromQuestionId}
                              likeQuestion={this.likeQuestion}
                              dislikeQuestion={this.dislikeQuestion}
-                             currentUser={this.state.currentUser}/> }/>
+                             currentUser={this.state.currentUser}
+                             paginate={this.setCurrentPage}/> }/>
               <Route path={"/tags"} exact render={() =>
                   <Tags tags={this.state.tags}
                         onAddTag={this.addTag}

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +38,13 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> listAll() {
-        return this.questionRepository.findAll();
+
+        Comparator<Question> dateComparator = (c1, c2) -> {
+            if (c1.getPosted().isBefore(c2.getPosted())) return -1;
+            else return 1;
+        };
+
+        return this.questionRepository.findAll().stream().sorted(dateComparator.reversed()).collect(Collectors.toList());
     }
 
     @Override
@@ -128,7 +135,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Optional<List<Tag>> searchTags(String pattern) {
-        List<Tag> foundTags = this.tagRepository.findAllByNameContains(pattern);
+        List<Tag> foundTags = this.tagRepository.findAllByNameContains(pattern).stream().sorted(Comparator.comparing(Tag::getName)).collect(Collectors.toList());
 
         return Optional.of(foundTags);
     }

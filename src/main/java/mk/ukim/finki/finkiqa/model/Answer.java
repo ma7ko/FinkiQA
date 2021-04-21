@@ -3,6 +3,7 @@ package mk.ukim.finki.finkiqa.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,6 +18,10 @@ public class Answer {
     private Long likes;
 
     private Long dislikes;
+
+    private LocalDateTime posted;
+
+    private LocalDateTime lastEdited;
 
     @ManyToOne
     private Question question;
@@ -39,5 +44,6 @@ public class Answer {
         this.dislikes = dislikes;
         this.question = question;
         this.user = user;
+        this.posted = LocalDateTime.now();
     }
 }

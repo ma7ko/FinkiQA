@@ -1,5 +1,5 @@
 import './answerForm.css';
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
 import {Link, useHistory} from "react-router-dom";
 import FinkiQAService from "../../../repository/finkiqaRepository";
 
@@ -46,6 +46,7 @@ class AnswerForm extends Component {
         this.getQuestion(id);
         FinkiQAService.getAnswersByQuestionId(id)
             .then((data) => {
+                console.log(data);
                 this.setState({
                     answers: data.data
                 });
@@ -55,22 +56,21 @@ class AnswerForm extends Component {
 
     render() {
         return (
-            <div className={"container mt-4"}>
+            <div className={"container"}>
                 <div className="row">
-                    <div className="col-md-5 ml-5">
+                    <div className="col-md-5 pb-4">
                         <form onSubmit={(e) => {e.preventDefault(); (this.props.answer !== undefined) ?
-                            this.editAnswer(this.props.answer.id, this.state.explanation, this.state.likes, this.state.dislikes, this.state.questionId, this.state.username) :
+                            this.editAnswer(this.props.answer.id, this.state.explanation, this.props.answer.likes, this.props.answer.dislikes, this.props.answer.question.id, this.props.answer?.user?.username) :
                             this.saveAnswer(this.state.explanation, this.state.likes, this.state.dislikes, this.props.questionId, this.state.username) }}>
 
                             <div className="form-group">
-                                <label htmlFor="explanation">Description</label>
-                                <textarea rows={"4"}
-                                          cols={"100"}
+                                <label htmlFor="explanation">Description</label> {console.log(this.props.answer?.explanation)}
+                                <textarea rows={this.props.numberOfRows}
                                     className={"form-control answer-text-box"}
                                           id="explanation"
                                           name="explanation"
                                           onChange={this.onChangeField}
-                                          value={this.state.explanation}
+                                          defaultValue={this.props.answer?.explanation}
                                           required></textarea>
                             </div>
 
@@ -80,7 +80,7 @@ class AnswerForm extends Component {
 
                             <button type="submit" className="btn btn-primary mr-2">Submit</button>
                             { this.props.answer === undefined &&
-                            <Link type="button" className="btn btn-primary mr-2" to={"/questions"}>Back</Link>}
+                            <Link type="button" className="btn btn-secondary mr-2" to={"/questions"}>Back</Link>}
                         </form>
                     </div>
                 </div>
